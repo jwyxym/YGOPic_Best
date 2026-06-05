@@ -7,22 +7,6 @@
 - 调用 `core-wasm` 计算 pHash
 - 使用 wasm `Database.find_best_match()` 返回候选识别结果
 
-## 依赖
-
-这个库复用当前项目里的依赖：
-
-```ts
-import { createYGOPicRecognizer } from './YGOPic_Best/src';
-```
-
-如果放到其它前端项目里，需要安装：
-
-```bash
-npm install onnxruntime-web
-```
-
-并把当前项目的 `core-wasm/pkg` 作为 `core-wasm` 包引入。
-
 ## 快速使用
 
 ```ts
@@ -30,7 +14,7 @@ import { createYGOPicRecognizer } from './YGOPic_Best/src';
 
 const recognizer = await createYGOPicRecognizer({
   modelUrl: '/best.onnx',
-  hashDbUrl: '/card_data.json',
+  hashDbUrl: '/card_data',
   ortWasmPaths: '/ort/',
   ortNumThreads: 1,
   onModelDownloadProgress: (progress) => {
@@ -57,7 +41,6 @@ type RecognizedCard = {
   index: number;
   matches: Array<{
     id: number;
-    name: string;
     distance: number;
     cardType: string;
     dbHash: string;
@@ -98,7 +81,7 @@ await recognizer.recognizeBox(image, editedBox, {
 ```ts
 const recognizer = await createYGOPicRecognizer({
   modelUrl: 'https://api.get-deck.com/best.onnx',
-  hashDbUrl: '/card_data.json',
+  hashDbUrl: '/card_data',
   inputName: 'images',
   inputSize: 1280,
   confidenceThreshold: 0.7,
