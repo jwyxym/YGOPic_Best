@@ -11,7 +11,8 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./core-wasm/*": "./dist/core-wasm/*"
+    "./dist/core-wasm/core_wasm_bg.wasm": "./dist/core-wasm/core_wasm_bg.wasm",
+    "./dist/onnxruntime-web/dist/*": "./dist/onnxruntime-web/dist/*"
   },
   "files": [
     "dist",

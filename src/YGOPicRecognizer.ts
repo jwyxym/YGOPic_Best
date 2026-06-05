@@ -81,6 +81,7 @@ export class YGOPicRecognizer {
       modelUrl: options.modelUrl ?? DEFAULT_MODEL_URL,
       hashDbJsonUrl: options.hashDbUrl ?? DEFAULT_HASH_DB_URL,
       hashDbUrl: options.hashDbUrl ?? undefined,
+      wasmPath: options.wasmPath ?? undefined,
       model: options.model ?? undefined,
       hashDb: options.hashDb ?? undefined,
       inputName: options.inputName ?? DEFAULT_INPUT_NAME,
@@ -232,7 +233,7 @@ export class YGOPicRecognizer {
         } else
           return await fetchJson<CardHashEntry[]>(this.options.hashDbJsonUrl);
       })(),
-      initWasm(),
+      initWasm(this.options.wasmPath),
     ]);
 
     this.session = await ort.InferenceSession.create(modelBuffer, {

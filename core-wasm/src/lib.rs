@@ -15,7 +15,7 @@ pub struct CardHashEntry {
 #[wasm_bindgen]
 pub struct Database {
     hashes: Vec<ImageHash<[u8; 32]>>,
-    ids: Vec<String>,
+    ids: Vec<u32>,
     types: Vec<u8>,
 }
 
@@ -38,7 +38,7 @@ impl Database {
             let bytes = hex::decode(&entry.phash).unwrap();
             let hash = ImageHash::<[u8; 32]>::from_bytes(&bytes).unwrap();
             self.hashes.push(hash);
-            self.ids.push(entry.id.to_string());
+            self.ids.push(entry.id);
             self.types.push(entry.card_type);
         }
     }
@@ -52,7 +52,7 @@ impl Database {
             let bytes = hex::decode(&entry.phash).unwrap();
             let hash = ImageHash::<[u8; 32]>::from_bytes(&bytes).unwrap();
             self.hashes.push(hash);
-            self.ids.push(entry.id.to_string());
+            self.ids.push(entry.id);
             self.types.push(entry.card_type);
         }
     }
