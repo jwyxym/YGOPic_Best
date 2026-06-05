@@ -63,6 +63,7 @@ export interface RecognitionProgress {
 
 export interface YGOPicRecognizerOptions {
   modelUrl?: string;
+  hashDbJsonUrl?: string;
   hashDbUrl?: string;
   model?: ArrayBuffer;
   hashDb?: ArrayBuffer;

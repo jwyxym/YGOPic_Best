@@ -47,14 +47,13 @@ type MatchResult = {
 export class YGOPicRecognizer {
   private session: ort.InferenceSession | null = null;
   private database: Database | null = null;
-  private hashDatabase: CardHashEntry[] | null = null;
   private initialized: Promise<void> | null = null;
 
   private readonly options: Required<
     Pick<
       YGOPicRecognizerOptions,
       | 'modelUrl'
-      | 'hashDbUrl'
+      | 'hashDbJsonUrl'
       | 'inputName'
       | 'inputSize'
       | 'confidenceThreshold'
@@ -67,7 +66,7 @@ export class YGOPicRecognizer {
     Omit<
       YGOPicRecognizerOptions,
       | 'modelUrl'
-      | 'hashDbUrl'
+      | 'hashDbJsonUrl'
       | 'inputName'
       | 'inputSize'
       | 'confidenceThreshold'
@@ -80,7 +79,8 @@ export class YGOPicRecognizer {
   constructor(options: YGOPicRecognizerOptions = {}) {
     this.options = {
       modelUrl: options.modelUrl ?? DEFAULT_MODEL_URL,
-      hashDbUrl: options.hashDbUrl ?? DEFAULT_HASH_DB_URL,
+      hashDbJsonUrl: options.hashDbUrl ?? DEFAULT_HASH_DB_URL,
+      hashDbUrl: options.hashDbUrl ?? undefined,
       model: options.model ?? undefined,
       hashDb: options.hashDb ?? undefined,
       inputName: options.inputName ?? DEFAULT_INPUT_NAME,
@@ -116,10 +116,6 @@ export class YGOPicRecognizer {
 
   getDatabase(): Database | null {
     return this.database;
-  }
-
-  getHashDatabase(): CardHashEntry[] | null {
-    return this.hashDatabase;
   }
 
   async detectCards(image: RecognizerImageSource): Promise<Box[]> {
@@ -225,37 +221,29 @@ export class YGOPicRecognizer {
       ort.env.wasm.numThreads = this.options.ortNumThreads;
     }
 
-    if (this.options.hashDb) {
-      const [modelBuffer] = await Promise.all([
-        fetchArrayBuffer(this.options.modelUrl, this.options.onModelDownloadProgress, this.options.model),
-        initWasm(),
-      ]);
+    const [modelBuffer, hashDatabase] = await Promise.all([
+      fetchArrayBuffer(this.options.modelUrl, this.options.onModelDownloadProgress, this.options.model),
+      (async () => {
+        if (this.options.hashDb)
+          return this.options.hashDb;
+        else if (this.options.hashDbUrl) {
+          const res = await fetch(this.options.hashDbUrl);
+          return await res.arrayBuffer();
+        } else
+          return await fetchJson<CardHashEntry[]>(this.options.hashDbJsonUrl);
+      })(),
+      initWasm(),
+    ]);
 
-      this.session = await ort.InferenceSession.create(modelBuffer, {
-        executionProviders: this.options.executionProviders,
-        graphOptimizationLevel: this.options.graphOptimizationLevel,
-      });
+    this.session = await ort.InferenceSession.create(modelBuffer, {
+      executionProviders: this.options.executionProviders,
+      graphOptimizationLevel: this.options.graphOptimizationLevel,
+    });
 
-      this.database = new Database();
-
-      this.database.load_database(new Uint8Array(this.options.hashDb));
-    } else {
-      const [modelBuffer, hashDatabase] = await Promise.all([
-        fetchArrayBuffer(this.options.modelUrl, this.options.onModelDownloadProgress, this.options.model),
-        fetchJson<CardHashEntry[]>(this.options.hashDbUrl),
-        initWasm(),
-      ]);
-
-      this.session = await ort.InferenceSession.create(modelBuffer, {
-        executionProviders: this.options.executionProviders,
-        graphOptimizationLevel: this.options.graphOptimizationLevel,
-      });
-
-      this.hashDatabase = hashDatabase;
-      this.database = new Database();
-
-      this.database.load_database_from_str(JSON.stringify(hashDatabase));
-    }
+    this.database = new Database();
+    Array.isArray(hashDatabase)
+      ? this.database.load_database_from_str(JSON.stringify(hashDatabase))
+      : this.database.load_database(new Uint8Array(hashDatabase));
   }
 
   private matchBox(

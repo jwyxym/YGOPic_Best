@@ -9,14 +9,14 @@ static CONFIG : Configuration = standard();
 pub struct CardHashEntry {
     pub id: u32,
     pub phash: String,
-    pub card_type: String,
+    pub card_type: u8,
 }
 
 #[wasm_bindgen]
 pub struct Database {
     hashes: Vec<ImageHash<[u8; 32]>>,
     ids: Vec<String>,
-    types: Vec<String>,
+    types: Vec<u8>,
 }
 
 #[wasm_bindgen]
@@ -62,8 +62,9 @@ impl Database {
         let bytes = hex::decode(hash_str).unwrap();
         let query_hash = ImageHash::<[u8; 32]>::from_bytes(&bytes).unwrap();
         let mut matches: Vec<(u32, usize)> = Vec::new();
+        let card_type = if card_type == "pendulum" { 1 } else { 0 };
         for (i, h) in self.hashes.iter().enumerate() {
-            if &self.types[i] == card_type {
+            if self.types[i] == card_type {
                 let dist = query_hash.dist(h);
                 matches.push((dist, i));
             }
