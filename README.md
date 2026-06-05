@@ -7,10 +7,14 @@
 - 调用 `core-wasm` 计算 pHash
 - 使用 wasm `Database.find_best_match()` 返回候选识别结果
 
-## 快速使用
+## 安装
+```bash
+npm install git+https://github.com/jwyxym/YGOPic_Best.git
+```
 
+## 快速使用
 ```ts
-import { createYGOPicRecognizer } from './YGOPic_Best/src';
+import { createYGOPicRecognizer } from 'ygopic-best';
 
 const recognizer = await createYGOPicRecognizer({
   modelUrl: '/best.onnx',
