@@ -1,0 +1,32 @@
+{
+  "name": "ygopic-best",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./core-wasm/*": "./dist/core-wasm/*"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prepare": "npm run wasm && npm run build",
+    "wasm": "cd core-wasm && wasm-pack build --target web --out-dir pkg && cd ..",
+    "build": "tsc -p tsconfig.build.json && node scripts/copy-wasm.mjs"
+  },
+  "dependencies": {
+    "onnxruntime-web": "^1.23.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}
