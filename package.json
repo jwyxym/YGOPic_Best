@@ -13,7 +13,7 @@
     },
     "./dist/core-wasm/core_wasm_bg.wasm": "./dist/core-wasm/core_wasm_bg.wasm",
     "./dist/onnxruntime-web/dist/*": "./dist/onnxruntime-web/dist/*",
-    "./onnx": "./dist/best.onnx"
+    "./dist/onnx": "./dist/best.onnx"
   },
   "files": [
     "dist",

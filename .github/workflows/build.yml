@@ -6,6 +6,39 @@ on:
       - master
     
 jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.18.0'
+        registry-url: 'https://registry.npmjs.org/'
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: 1.95.0
+
+    - name: Rust cache
+      uses: swatinem/rust-cache@v2
+      with:
+        workspaces: './src-tauri -> target'
+
+    - name: Init
+      run: |
+        npm ci
+        cargo install wasm-pack
+        rustup target add wasm32-unknown-unknown
+
+    - name: Publish
+      run: npm publish --//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
+
   build:
     runs-on: ubuntu-latest
     
@@ -40,10 +73,7 @@ jobs:
       run: |
         npm pack
         mv *.tgz ygopic-best.tgz
-
-    - name: Publish
-      run: npm publish --//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
-
+        
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
