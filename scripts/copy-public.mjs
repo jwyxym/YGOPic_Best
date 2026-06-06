@@ -11,8 +11,4 @@ if (!existsSync(sourceDir)) {
 
 mkdirSync(dirname(targetDir), { recursive: true });
 
-if (existsSync(targetDir)) {
-  rmSync(targetDir, { recursive: true, force: true });
-}
-
 cpSync(sourceDir, targetDir, { recursive: true });
