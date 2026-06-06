@@ -2,7 +2,7 @@
   "name": "ygopic-best",
   "version": "0.1.0",
   "type": "module",
-  "private": true,
+  "private": false,
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -12,7 +12,8 @@
       "import": "./dist/index.js"
     },
     "./dist/core-wasm/core_wasm_bg.wasm": "./dist/core-wasm/core_wasm_bg.wasm",
-    "./dist/onnxruntime-web/dist/*": "./dist/onnxruntime-web/dist/*"
+    "./dist/onnxruntime-web/dist/*": "./dist/onnxruntime-web/dist/*",
+    "./onnx": "./dist/best.onnx"
   },
   "files": [
     "dist",
@@ -22,7 +23,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "prepack": "npm run wasm && npm run build",
     "wasm": "cd core-wasm && wasm-pack build --target web --out-dir pkg && cd ..",
-    "build": "tsc -p tsconfig.build.json && node scripts/copy-wasm.mjs && node scripts/copy-onnxruntime-web.mjs"
+    "build": "tsc -p tsconfig.build.json && node scripts/copy-wasm.mjs && node scripts/copy-onnxruntime-web.mjs && node scripts/copy-public.mjs"
   },
   "dependencies": {
     "onnxruntime-web": "^1.23.2"

@@ -11,7 +11,7 @@
 
 ## 安装
 ```bash
-npm install https://github.com/jwyxym/YGOPic_Best/releases/download/release-latest/ygopic-best.tgz
+npm install ygopic-best
 ```
 
 ## 快速使用

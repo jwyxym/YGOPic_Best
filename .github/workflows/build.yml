@@ -38,7 +38,12 @@ jobs:
     - name: build
       run: |
         npm pack
-        mv ygopic-best-0.1.0.tgz ygopic-best.tgz
+        mv *.tgz ygopic-best.tgz
+
+    - name: Publish
+      run: npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
     - name: Upload
       uses: actions/upload-artifact@v4
