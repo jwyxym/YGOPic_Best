@@ -36,12 +36,26 @@ jobs:
         mkdir -p ~/.ssh
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
         chmod 600 ~/.ssh/id_ed25519
-        ssh-keyscan gitcode.com >> ~/.ssh/known_hosts
+        ssh-keyscan code.moenext.com >> ~/.ssh/known_hosts
+
+    - name: Cache
+      uses: actions/cache@v4
+      with:
+        path: core-wasm/hd-arts
+        key: ${{ runner.os }}-cache-hd-arts-${{ hashFiles('core-wasm/hd-arts/**') }}
+        restore-keys: |
+          ${{ runner.os }}-cache-hd-arts
 
     - name: build
       run: |
         cd core-wasm
-        git clone git@git.moenext.com:mycard/hd-arts.git --depth 1
+        if [ -d "./hd-arts" ]; then
+          cd hd-arts
+          git pull
+          cd ..
+        else
+          git clone git@git.moenext.com:mycard/hd-arts.git --depth 1
+        fi
         cargo run --release -- hd-arts/arts
 
     - name: Upload
