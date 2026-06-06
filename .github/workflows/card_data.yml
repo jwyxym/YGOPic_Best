@@ -19,6 +19,11 @@ jobs:
       with:
         toolchain: 1.95.0
 
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.18.0'
+
     - name: Rust cache
       uses: swatinem/rust-cache@v2
       with:
@@ -38,6 +43,17 @@ jobs:
         chmod 600 ~/.ssh/id_ed25519
         ssh-keyscan git.moenext.com >> ~/.ssh/known_hosts
 
+    - name: Proxy
+      run: |
+        npm i pm2 -g
+        wget https://github.com/shadowsocks/shadowsocks-rust/releases/download/v1.24.0/shadowsocks-v1.24.0.x86_64-unknown-linux-gnu.tar.xz
+        mkdir ss
+        tar -xJf shadowsocks-v1.24.0.x86_64-unknown-linux-gnu.tar.xz -C ./ss
+        cd ss
+        chmod 777 *
+        echo "${{ secrets.CONFIG_FILE }}" | config.json
+        pm2 start sslocal --name ss -- -c config.json
+
     - name: Cache
       uses: actions/cache@v4
       with:
@@ -46,7 +62,10 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-cache-hd-arts
 
-    - name: build
+    - name: clone pics
+      env:
+        http_proxy: http://127.0.0.1:1081
+        https_proxy: http://127.0.0.1:1081
       run: |
         cd core-wasm
         if [ -d "./hd-arts" ]; then
@@ -54,8 +73,11 @@ jobs:
           git pull
           cd ..
         else
-          git clone git@git.moenext.com:mycard/hd-arts.git --depth 1
+          git clone ${{ secrets.PIC_URL }} --depth 1
         fi
+
+    - name: build
+      run: |
         cargo run --release -- hd-arts/arts
 
     - name: Upload
