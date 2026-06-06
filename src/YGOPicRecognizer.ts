@@ -1,4 +1,4 @@
-import * as ort from 'onnxruntime-web';
+import * as ort from 'onnxruntime-web/wasm';
 import initWasm, { Database, get_phash_raw } from 'core-wasm';
 import { ImageProcessor, PENDULUM_CARD, STANDARD_CARD, createSourceCanvas } from './image';
 import {
@@ -10,6 +10,7 @@ import {
   preprocessImage,
   sortBoxesByRow,
 } from './yolo';
+import { DEFAULT_ORT_WASM_PATHS } from './ort-assets';
 import type {
   Box,
   CardHashEntry,
@@ -87,7 +88,7 @@ export class YGOPicRecognizer {
       inputName: options.inputName ?? DEFAULT_INPUT_NAME,
       executionProviders: options.executionProviders ?? ['wasm'],
       graphOptimizationLevel: options.graphOptimizationLevel ?? 'all',
-      ortWasmPaths: options.ortWasmPaths,
+      ortWasmPaths: options.ortWasmPaths ?? DEFAULT_ORT_WASM_PATHS,
       ortNumThreads: options.ortNumThreads,
       inputSize: options.inputSize ?? DEFAULT_INPUT_SIZE,
       confidenceThreshold: options.confidenceThreshold ?? DEFAULT_CONF_THRESHOLD,

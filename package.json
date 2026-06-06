@@ -12,7 +12,6 @@
       "import": "./dist/index.js"
     },
     "./core-wasm/core_wasm_bg.wasm": "./dist/core-wasm/core_wasm_bg.wasm",
-    "./onnxruntime-web/dist/*": "./dist/onnxruntime-web/dist/*",
     "./onnx": "./dist/best.onnx"
   },
   "files": [

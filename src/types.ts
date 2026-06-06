@@ -1,4 +1,4 @@
-import type * as ort from 'onnxruntime-web';
+import type * as ort from 'onnxruntime-web/wasm';
 
 export interface Box {
   x1: number;

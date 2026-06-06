@@ -1,4 +1,4 @@
-import * as ort from 'onnxruntime-web';
+import * as ort from 'onnxruntime-web/wasm';
 import type { Box, RecognizerImageSource, YoloPreprocessResult } from './types';
 
 export const DEFAULT_INPUT_SIZE = 1280;

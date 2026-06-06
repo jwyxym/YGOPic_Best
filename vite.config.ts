@@ -1,4 +1,4 @@
-import { copyFileSync, cpSync, existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs';
+import { copyFileSync, cpSync, existsSync, mkdirSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { defineConfig, type Plugin } from 'vite';
 import dts from 'vite-plugin-dts';
@@ -11,7 +11,6 @@ function copyRuntimeAssets(): Plugin {
       const distDir = join(root, 'dist');
 
       copyCoreWasm(root, distDir);
-      copyOnnxRuntime(root, distDir);
       copyPublic(root, distDir);
     },
   };
@@ -34,23 +33,6 @@ function copyCoreWasm(root: string, distDir: string) {
   }
 }
 
-function copyOnnxRuntime(root: string, distDir: string) {
-  const sourceDir = join(root, 'node_modules', 'onnxruntime-web');
-  const targetDir = join(distDir, 'onnxruntime-web');
-
-  if (!existsSync(sourceDir)) {
-    throw new Error(`onnxruntime-web package not found: ${sourceDir}`);
-  }
-
-  mkdirSync(dirname(targetDir), { recursive: true });
-
-  if (existsSync(targetDir)) {
-    rmSync(targetDir, { recursive: true, force: true });
-  }
-
-  cpSync(sourceDir, targetDir, { recursive: true });
-}
-
 function copyPublic(root: string, distDir: string) {
   const sourceDir = join(root, 'public');
 
@@ -63,6 +45,9 @@ function copyPublic(root: string, distDir: string) {
 }
 
 export default defineConfig({
+  resolve: {
+    conditions: ['onnxruntime-web-use-extern-wasm'],
+  },
   plugins: [
     dts({
       entryRoot: 'src',
@@ -71,6 +56,7 @@ export default defineConfig({
     copyRuntimeAssets(),
   ],
   build: {
+    assetsInlineLimit: 0,
     lib: {
       entry: 'src/index.ts',
       formats: ['es'],
@@ -79,7 +65,10 @@ export default defineConfig({
     sourcemap: true,
     target: 'es2020',
     rollupOptions: {
-      external: ['core-wasm', 'onnxruntime-web'],
+      external: (id) =>
+        id === 'core-wasm' ||
+        id === 'onnxruntime-web/ort-wasm-simd-threaded.mjs?url' ||
+        id === 'onnxruntime-web/ort-wasm-simd-threaded.wasm?url',
       output: {
         paths: {
           'core-wasm': './core-wasm/core_wasm.js',
