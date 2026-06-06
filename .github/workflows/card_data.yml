@@ -19,41 +19,11 @@ jobs:
       with:
         toolchain: 1.95.0
 
-    - name: Install Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '22.18.0'
-
     - name: Rust cache
       uses: swatinem/rust-cache@v2
       with:
         workspaces: './src-tauri -> target'
-
-    - name: Git Config
-      run: |
-        git config --global user.name "GitHub Actions"
-        git config --global user.email "github-actions@github.com"
-
-    - name: Set SSH Key
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      run: |
-        mkdir -p ~/.ssh
-        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
-        chmod 600 ~/.ssh/id_ed25519
-        ssh-keyscan git.moenext.com >> ~/.ssh/known_hosts
-
-    - name: Proxy
-      run: |
-        npm i pm2 -g
-        wget https://github.com/shadowsocks/shadowsocks-rust/releases/download/v1.24.0/shadowsocks-v1.24.0.x86_64-unknown-linux-gnu.tar.xz
-        mkdir ss
-        tar -xJf shadowsocks-v1.24.0.x86_64-unknown-linux-gnu.tar.xz -C ./ss
-        cd ss
-        chmod 777 *
-        printf '%s\n' '${{ secrets.CONFIG_FILE }}' > config.json
-        pm2 start ./sslocal --name ss -- -c config.json
-
+  
     - name: Cache
       uses: actions/cache@v4
       with:
@@ -62,10 +32,23 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-cache-hd-arts
 
-    - name: clone pics
+    - name: prepare
+      run: |
+        sudo apt update
+        sudo apt install openconnect
+
+    - name: Connect VPN
       env:
-        http_proxy: http://127.0.0.1:1081
-        https_proxy: http://127.0.0.1:1081
+        VPN_USER: ${{ secrets.VPN_USER }}
+        VPN_PASSWORD: ${{ secrets.VPN_PASSWORD }}
+      run: |
+        echo "$VPN_PASSWORD" | sudo openconnect \
+          --user="$VPN_USER" \
+          --passwd-on-stdin \
+          --background \
+          ${{ secrets.VPN_URL }}
+
+    - name: build
       run: |
         cd core-wasm
         if [ -d "./hd-arts" ]; then
@@ -75,9 +58,6 @@ jobs:
         else
           git clone ${{ secrets.PIC_URL }} --depth 1
         fi
-
-    - name: build
-      run: |
         cargo run --release -- hd-arts/arts
 
     - name: Upload
