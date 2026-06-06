@@ -2,3 +2,4 @@ node_modules
 dist
 core-wasm/target
 core-wasm/pkg
+*.tgz

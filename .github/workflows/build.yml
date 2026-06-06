@@ -1,0 +1,73 @@
+name: build ygopic-best
+
+on:
+  push:
+    branches:
+      - master
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.18.0'
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: 1.95.0
+
+    - name: Rust cache
+      uses: swatinem/rust-cache@v2
+      with:
+        workspaces: './src-tauri -> target'
+
+    - name: Init
+      run: |
+        npm ci
+        cargo install wasm-pack
+        rustup target add wasm32-unknown-unknown
+    
+    - name: build
+      run: |
+        npm pack
+        mv ygopic-best-0.1.0.tgz ygopic-best.tgz
+
+    - name: Upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: ygopic-best.tgz
+        retention-days: 1
+        path: ./ygopic-best.tgz
+
+  create-release:
+    needs: [build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: build
+
+      - name: Create release-latest
+        run: |
+          cd build
+          gh release delete release-latest --cleanup-tag -y || true
+          gh release create release-latest $(find . -type f) \
+            --target "$GITHUB_SHA" \
+            --title "release-latest" \
+            --notes "Latest build for ${{ github.ref_name }}" \
+            --latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
