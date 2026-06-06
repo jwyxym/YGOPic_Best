@@ -48,10 +48,7 @@ jobs:
         VPN_PASSWORD: ${{ secrets.VPN_PASSWORD }}
       run: |
         npm i pm2 -g
-        pm2 start echo "$VPN_PASSWORD" | sudo openconnect --name proxy -- \
-          --user="$VPN_USER" \
-          --passwd-on-stdin \
-          ${{ secrets.VPN_URL }}
+        pm2 start bash --name proxy -- -lc 'echo "$VPN_PASSWORD" | sudo openconnect --user="$VPN_USER" --passwd-on-stdin "${VPN_SERVER}"'
 
     - name: build
       run: |
