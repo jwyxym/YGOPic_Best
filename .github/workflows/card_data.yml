@@ -1,0 +1,77 @@
+name: build ygopic-best
+
+on:
+  push:
+    tags:
+      - '*'
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: 1.95.0
+
+    - name: Rust cache
+      uses: swatinem/rust-cache@v2
+      with:
+        workspaces: './src-tauri -> target'
+
+    - name: Git Config
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "github-actions@github.com"
+
+    - name: Set SSH Key
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      run: |
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+        chmod 600 ~/.ssh/id_ed25519
+        ssh-keyscan gitcode.com >> ~/.ssh/known_hosts
+
+    - name: build
+      run: |
+        cd core-wasm
+        git clone git@git.moenext.com:mycard/hd-arts.git --depth 1
+        cargo run --release -- hd-arts/arts
+
+    - name: Upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: card_data
+        retention-days: 1
+        path: ./core-wasm/card_data
+
+  create-release:
+    needs: [build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: build
+
+      - name: Create card_data
+        run: |
+          cd build
+          gh release delete hash-latest --cleanup-tag -y || true
+          gh release create hash-latest $(find . -type f) \
+            --target "$GITHUB_SHA" \
+            --title "card_data" \
+            --notes "Latest build for ${{ github.ref_name }}" \
+            --latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
