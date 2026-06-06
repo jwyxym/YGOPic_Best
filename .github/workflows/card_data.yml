@@ -36,7 +36,7 @@ jobs:
         mkdir -p ~/.ssh
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
         chmod 600 ~/.ssh/id_ed25519
-        ssh-keyscan code.moenext.com >> ~/.ssh/known_hosts
+        ssh-keyscan git.moenext.com >> ~/.ssh/known_hosts
 
     - name: Cache
       uses: actions/cache@v4
