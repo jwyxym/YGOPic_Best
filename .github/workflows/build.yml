@@ -54,8 +54,40 @@ jobs:
         retention-days: 1
         path: ./public/best.onnx
 
+  build-rust-bin:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: 1.95.0
+
+    - name: Rust cache
+      uses: swatinem/rust-cache@v2
+      with:
+        workspaces: './src-tauri -> target'
+
+    - name: build
+      run: |
+        cd core-wasm
+        cargo build --release
+        cd ..
+        mv core-wasm/target/release/core-wasm ygopic_best
+
+    - name: Upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: ygopic_best
+        retention-days: 1
+        path: ./ygopic_best
+
   create-release:
-    needs: [build]
+    needs: [build, build-rust-bin]
     runs-on: ubuntu-latest
     permissions:
       contents: write
