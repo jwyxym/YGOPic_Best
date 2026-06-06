@@ -32,6 +32,23 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-cache-hd-arts
 
+    - name: prepare
+      run: |
+        sudo apt update
+        sudo apt install openconnect
+
+
+    - name: Connect VPN
+      env:
+        VPN_USER: ${{ secrets.VPN_USER }}
+        VPN_PASSWORD: ${{ secrets.VPN_PASSWORD }}
+      run: |
+        echo "$VPN_PASSWORD" | sudo openconnect \
+          --user="$VPN_USER" \
+          --passwd-on-stdin \
+          --background \
+          ${{ secrets.VPN_URL }}
+
     - name: build
       run: |
         cd core-wasm
