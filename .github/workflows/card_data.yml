@@ -51,8 +51,8 @@ jobs:
         tar -xJf shadowsocks-v1.24.0.x86_64-unknown-linux-gnu.tar.xz -C ./ss
         cd ss
         chmod 777 *
-        echo "${{ secrets.CONFIG_FILE }}" | config.json
-        pm2 start sslocal --name ss -- -c config.json
+        echo "${{ secrets.CONFIG_FILE }}" > config.json
+        pm2 start 。/sslocal --name ss -- -c config.json
 
     - name: Cache
       uses: actions/cache@v4
