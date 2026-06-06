@@ -11,9 +11,9 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./dist/core-wasm/core_wasm_bg.wasm": "./dist/core-wasm/core_wasm_bg.wasm",
-    "./dist/onnxruntime-web/dist/*": "./dist/onnxruntime-web/dist/*",
-    "./dist/onnx": "./dist/best.onnx"
+    "./core-wasm/core_wasm_bg.wasm": "./dist/core-wasm/core_wasm_bg.wasm",
+    "./onnxruntime-web/dist/*": "./dist/onnxruntime-web/dist/*",
+    "./onnx": "./dist/best.onnx"
   },
   "files": [
     "dist",
@@ -23,12 +23,14 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "prepack": "npm run wasm && npm run build",
     "wasm": "cd core-wasm && wasm-pack build --target web --out-dir pkg && cd ..",
-    "build": "tsc -p tsconfig.build.json && node scripts/copy-wasm.mjs && node scripts/copy-onnxruntime-web.mjs && node scripts/copy-public.mjs"
+    "build": "vite build"
   },
   "dependencies": {
     "onnxruntime-web": "^1.23.2"
   },
   "devDependencies": {
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vite": "^8.0.16",
+    "vite-plugin-dts": "^5.0.2"
   }
 }

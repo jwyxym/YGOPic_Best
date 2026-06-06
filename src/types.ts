@@ -71,7 +71,7 @@ export interface YGOPicRecognizerOptions {
   inputName?: string;
   executionProviders?: ort.InferenceSession.SessionOptions['executionProviders'];
   graphOptimizationLevel?: ort.InferenceSession.SessionOptions['graphOptimizationLevel'];
-  ortWasmPaths?: string;
+  ortWasmPaths?: ort.Env.WasmPrefixOrFilePaths;
   ortNumThreads?: number;
   inputSize?: number;
   confidenceThreshold?: number;

@@ -3,7 +3,7 @@ use lib::CardHashEntry;
 
 use bincode::{encode_to_vec, config::standard};
 use image::GenericImageView;
-use std::fs::{write, create_dir_all};
+use std::fs::write;
 
 #[cfg(not(target_family = "wasm"))]
     use anyhow::{Result, Error};
