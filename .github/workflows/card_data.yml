@@ -37,15 +37,20 @@ jobs:
         sudo apt update
         sudo apt install openconnect
 
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.18.0'
+
     - name: Connect VPN
       env:
         VPN_USER: ${{ secrets.VPN_USER }}
         VPN_PASSWORD: ${{ secrets.VPN_PASSWORD }}
       run: |
-        echo "$VPN_PASSWORD" | sudo openconnect \
+        npm i pm2 -g
+        pm2 start echo "$VPN_PASSWORD" | sudo openconnect --name proxy -- \
           --user="$VPN_USER" \
           --passwd-on-stdin \
-          --background \
           ${{ secrets.VPN_URL }}
 
     - name: build
