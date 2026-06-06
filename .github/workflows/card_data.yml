@@ -24,42 +24,10 @@ jobs:
       with:
         workspaces: './src-tauri -> target'
   
-    - name: Cache
-      uses: actions/cache@v4
-      with:
-        path: core-wasm/hd-arts
-        key: ${{ runner.os }}-cache-hd-arts-${{ hashFiles('core-wasm/hd-arts/**') }}
-        restore-keys: |
-          ${{ runner.os }}-cache-hd-arts
-
-    - name: prepare
-      run: |
-        sudo apt update
-        sudo apt install openconnect
-
-    - name: Install Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '22.18.0'
-
-    - name: Connect VPN
-      env:
-        VPN_USER: ${{ secrets.VPN_USER }}
-        VPN_PASSWORD: ${{ secrets.VPN_PASSWORD }}
-      run: |
-        npm i pm2 -g
-        pm2 start bash --name proxy -- -lc 'echo "$VPN_PASSWORD" | sudo openconnect --user="$VPN_USER" --passwd-on-stdin "${VPN_SERVER}"'
-
     - name: build
       run: |
         cd core-wasm
-        if [ -d "./hd-arts" ]; then
-          cd hd-arts
-          git pull
-          cd ..
-        else
-          git clone ${{ secrets.PIC_URL }} --depth 1
-        fi
+        git clone ${{ secrets.PIC_URL }} --depth 1
         cargo run --release -- hd-arts/arts
 
     - name: Upload
