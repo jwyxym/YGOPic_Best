@@ -1,5 +1,7 @@
 # YGOPic_Best
 
+原算法来自：[GetDeck](https://github.com/Souls-R/getdeck)
+
 前端可用的游戏王卡图识别 TypeScript 库，封装了：
 
 - `onnxruntime-web` 调用 YOLO 模型检测图片里的卡片区域
@@ -9,7 +11,7 @@
 
 ## 安装
 ```bash
-npm install git+https://github.com/jwyxym/YGOPic_Best.git
+npm install https://github.com/jwyxym/YGOPic_Best/releases/download/release-latest/ygopic-best.tgz
 ```
 
 ## 快速使用

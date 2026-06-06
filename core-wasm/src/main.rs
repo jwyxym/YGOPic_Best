@@ -61,8 +61,8 @@ async fn main() -> Result<(), Error> {
             });
         }
         let buffer = encode_to_vec(result, standard())?;
-        create_dir_all("target/card_data")?;
-        write("target/card_data/card_data", buffer)?;
+        create_dir_all("./card_data")?;
+        write("./card_data", buffer)?;
     }
     Ok(())
 }
