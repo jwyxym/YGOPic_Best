@@ -80,7 +80,7 @@ export class YGOPicRecognizer {
   constructor(options: YGOPicRecognizerOptions = {}) {
     this.options = {
       modelUrl: options.modelUrl ?? DEFAULT_MODEL_URL,
-      hashDbJsonUrl: options.hashDbUrl ?? DEFAULT_HASH_DB_URL,
+      hashDbJsonUrl: options.hashDbJsonUrl ?? DEFAULT_HASH_DB_URL,
       hashDbUrl: options.hashDbUrl ?? undefined,
       wasmPath: options.wasmPath ?? undefined,
       model: options.model ?? undefined,
