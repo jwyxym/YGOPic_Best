@@ -305,11 +305,11 @@ export class YGOPicRecognizer {
     const matches: Match[] = [];
 
     if (cardTypes.includes('standard')) {
-      matches.push(...normalizeMatches(database.find_best_match(hashStandard, 'standard')));
+      matches.push(...normalizeMatches(database.find_best_match(hashStandard, 0)));
     }
 
     if (cardTypes.includes('pendulum')) {
-      matches.push(...normalizeMatches(database.find_best_match(hashPendulum, 'pendulum')));
+      matches.push(...normalizeMatches(database.find_best_match(hashPendulum, 1)));
     }
 
     return matches.sort((a, b) => a.distance - b.distance);
