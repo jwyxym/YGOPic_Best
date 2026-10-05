@@ -97,11 +97,3 @@ jobs:
           bucket: ${{ secrets.S3_BUCKET }}
           file_name: card_data
           file_path: ./build/card_data/card_data
-
-      - uses: jwyxym/jwyxym/edgeone-cache@master
-        with:
-          secret_id: ${{ secrets.EDGE_ID }}
-          secret_key: ${{ secrets.EDGE_KEY }}
-          zone_id: ${{ secrets.EDGE_ZONE_ID }}
-          url_target: ${{ secrets.EDGE_URL }}
-          flush_type: "purge_prefix"
