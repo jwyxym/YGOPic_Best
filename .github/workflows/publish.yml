@@ -1,4 +1,4 @@
-name: build ygopic-best
+name: publish
 
 on:
   push:
